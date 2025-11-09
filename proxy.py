@@ -23,6 +23,8 @@ async def proxy_rpc(req: Request):
     method  = payload.get("method")
     req_id  = payload.get("id")
 
+    print(f"Proxy got: {method}")  # <-- add this line
+
     # --- 1️⃣  old-style handshake ---
     if method == "initialize":
         print("Proxy: replying to initialize with 2023-10-10")
