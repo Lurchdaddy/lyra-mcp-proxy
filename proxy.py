@@ -9,6 +9,8 @@ REAL_BRIDGE = os.getenv("REAL_BRIDGE", "https://lyra-mcp-bridge.onrender.com/sse
 
 app = FastAPI(title="Lyra MCP Compatibility Proxy")
 
+print("Proxy started; forwarding to:", REAL_BRIDGE)      # <── add this right after you create the app
+
 # --------------- helpers ---------------
 
 def ok(req_id, result):
@@ -37,9 +39,12 @@ async def proxy_rpc(req: Request):
     # --- 2️⃣  everything else -> forward to the real bridge ---
     async with httpx.AsyncClient(timeout=30.0) as client:
         try:
+            print(f"Forwarding {method} to real bridge…")  # <── new line
             r = await client.post(REAL_BRIDGE, json=payload)
+            print("Response from real bridge:", r.status_code)  # <── new line
             return JSONResponse(r.json())
         except Exception as e:
+            print("Proxy error:", e)
             return JSONResponse(
                 {"jsonrpc": "2.0", "id": req_id,
                  "error": {"code": -32000, "message": f"Proxy error: {e}"}},
